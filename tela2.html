@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Software Solução de Pesagem - Tela 2</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <style>
+    /* Estilos para a tela2.html */
+    body {
+      background-color: #fff;
+    }
+    
+    .header {
+      background-color: #fff;
+      padding: 20px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .welcome-text {
+      margin-bottom: 20px;
+    }
+    
+    .welcome-title {
+      color: #000;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .welcome-subtitle {
+      color: #666;
+      font-size: 18px;
+    }
+    
+    .wallet-info {
+      display: flex;
+      align-items: center;
+    }
+    
+    .wallet-status {
+      color: #00cc66;
+      font-size: 14px;
+      font-weight: bold;
+      margin-right: 5px;
+    }
+    
+    .wallet-address {
+      color: #00cc66;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+    
+    .contract-section {
+      margin: 50px auto;
+      max-width: 400px;
+      text-align: center;
+      background-color: #e7f0ff;
+      padding: 50px;
+      border-radius: 50px;
+      border: 1px solid #000000;
+    }
+    
+    .contract-section h2 {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    
+    .contract-section p {
+      margin-bottom: 80px;
+    }
+    
+    .contract-section input {
+      width: 80%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    
+    .contract-section button {
+      background-color: #47c0ff;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    
+    .contract-section button:hover {
+      background-color: #0092e6;
+    }
+
+    .error-message {
+      color: red;
+      text-align: center;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="wallet-info">
+      <span class="wallet-status">Conectado</span>
+      <span class="wallet-address">0x978cC110CeD2575b3C9bA43eD41002B37CF4D846</span>
+    </div>
+  </div>
+
+  <div class="contract-section">
+    <h2>Seja bem-vindo(a) ao SSP</h2>
+    <p>O maior Software de Solução de Pesagem destinado a segurança na área de pesagem</p>
+    <div class="input-section">
+      <h3>Insira o número do contrato</h3>
+      <input type="text" id="contractNumberInput" placeholder="Número do contrato">
+      <button id="confirmContractButton">Confirmar</button>
+    </div>
+    <div class="error-message" id="errorMessage" style="display: none;">Contrato não encontrado. Verifique o número e tente novamente.</div>
+  </div>
+
+  <script>
+    // Função para confirmar o contrato inserido
+    function confirmContract() {
+      const contractNumber = document.getElementById('contractNumberInput').value;
+      
+      if (contracts.includes(contractNumber)) {
+        // Redirecionar para a tela3.html com o número do contrato como parâmetro
+        window.location.href = `tela3.html?contractNumber=${contractNumber}`;
+      } else {
+        // Exibir mensagem de erro
+        document.getElementById('errorMessage').style.display = 'block';
+      }
+    }
+
+    // Adicionar evento de clique ao botão de confirmação
+    const confirmContractButton = document.getElementById('confirmContractButton');
+    confirmContractButton.addEventListener('click', confirmContract);
+  </script>
+</body>
+</html>

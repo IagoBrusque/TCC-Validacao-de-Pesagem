@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Software Solução de Pesagem - Tela 3</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+  <style>
+    /* Estilos para a tela3.html */
+    body {
+      background-color: #ffffff;
+    }
+    
+    .header {
+      background-color: transparent;
+      padding: 10px;
+      display: absolute;
+      justify-content: space-between;
+      border-radius: 5px;
+    }
+    
+    .header-content {
+      display: absolute;
+      flex-direction: column;
+      align-items: center;
+      text-align: left;
+    }
+    
+    .header-title {
+      color: #000; /* Ajuste da cor do título */
+      font-size: 40px;
+      margin-left: 85px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .header-subtitle {
+      color: #3b3b3b; /* Ajuste da cor do subtítulo */
+      font-size: 18px;
+      margin-left: 85px;
+      margin-bottom: 20px;
+    }
+    
+    .contract-details {
+      max-width: 300px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: #e7f0ff; /* Ajuste da cor de fundo do bloco de informações de pesagem */
+      border: 1px solid #000000;
+      border-radius: 8px;
+    }
+    
+    .contract-details h2 {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    
+    .contract-details p {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #000; /* Cor dos nomes das informações de pesagem */
+    }
+    
+    .contract-info {
+      font-size: 14px;
+      font-weight: normal;
+      margin-bottom: 10px;
+      color: #3b3b3b; /* Cor dos valores de pesagem */
+    }
+
+    /* Estilos para centralizar a frase "Informações sobre o contrato inserido:" */
+    .contract-details-title {
+      text-align: center;
+      font-size: 18px;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      color: #000; /* Cor do título */
+    }
+
+    /* Estilos para os botões */
+    .button {
+      background-color: #47c0ff;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-right: 20px;
+    }
+
+    .button.white {
+      background-color: #fff;
+      color: #000;
+      border: 1px solid #000; /* Borda preta ao botão "Voltar" */
+    }
+
+    /* Estilos para a caixa de diálogo */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .dialog-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .dialog-content {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .dialog-buttons {
+      display: flex;
+      justify-content: center;
+    }
+
+    .dialog-button {
+      background-color: #47c0ff;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-right: 10px;
+    }
+
+    .dialog-button.validate {
+      background-color: #00cc66; /* Cor do botão "Validar" */
+    }
+
+    .dialog-button.adjust {
+      background-color: #ff0000; /* Cor do botão "Incorreto" */
+    }
+
+    /* Estilos para a mensagem de validação */
+    .validation-message {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    /* Estilos para a situação do contrato */
+    .contract-status {
+      text-align: center;
+      font-size: 20px;
+      margin-top: 20px;
+      color: #000;
+    }
+
+    .contract-status.validated {
+      color: #00cc66; /* Cor do status do contrato validado */
+    }
+
+    .contract-status.inAnalysis {
+      color: gray; /* Cor do status do contrato em análise */
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <h1 class="header-title">Software Solução de Pesagem</h1>
+      <h3 class="header-subtitle">O maior Software de Solução de Pesagem destinado a segurança na área de pesagem e cubagem</h3>
+    </div>
+  </div>
+
+  <h3 class="contract-details-title">Informações sobre o contrato inserido:</h3>
+  <div class="contract-details">
+    <p>Data: <span class="contract-info" id="contractDate"></span></p>
+    <p>Hora: <span class="contract-info" id="contractTime"></span></p>
+    <p>TAG do vagão: <span class="contract-info" id="contractTag"></span></p>
+    <p>Número de locomotivas: <span class="contract-info" id="contractNumLocomotives"></span></p>
+    <p>Número de vagões: <span class="contract-info" id="contractNumVagons"></span></p>
+    <p>Peso Bruto: <span class="contract-info" id="contractWeight"></span></p>
+  </div>
+
+  <!-- Botões -->
+  <div style="text-align: center; margin-top: 20px;">
+    <button class="button white" onclick="goBack()">Voltar</button>
+    <button class="button" onclick="showConfirmationDialog()">Validar Pesagem</button>
+  </div>
+
+  <!-- Elemento para exibir a situação do contrato -->
+  <div class="contract-status" id="contractStatus">O contrato está em análise</div>
+
+  <!-- Caixa de diálogo -->
+  <div class="overlay" id="dialogOverlay">
+    <div class="dialog-box">
+      <div class="dialog-content">
+        <p>Pode validar a pesagem?</p>
+      </div>
+      <div class="dialog-buttons">
+        <button class="dialog-button validate" onclick="transferToSupplier()">Correto</button>
+        <button class="dialog-button adjust" onclick="transferToUser()">Incorreto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Elemento para exibir a mensagem de validação -->
+  <div class="validation-message" id="validationMessage"></div>
+
+  <script>
+    // Função para obter o valor do parâmetro "contractNumber" da URL
+    function getContractNumberFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('contractNumber');
+    }
+    // Configuração do chainId correto para Sepolia (11155111)
+    const chainId = '0xab67'; // Hexadecimal para 11155111
+
+    // Verificação da instância do Web3 e configuração do chainId
+    async function setupWeb3() {
+      if (window.ethereum) {
+        window.web3 = new Web3(window.ethereum);
+        try {
+          // Solicitar acesso à carteira do usuário
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          // Configurar o chainId correto
+          await window.ethereum.request({ method: 'eth_chainId', params: [chainId] });
+        } catch (error) {
+          console.error('Acesso à carteira negado pelo usuário.');
+        }
+      } else {
+        console.error('Web3 não detectado. Verifique se você está usando um navegador compatível com Ethereum e possui o MetaMask instalado.');
+      }
+    }
+
+    // Chamada da função de configuração do Web3
+    setupWeb3();
+
+    // Preencher os elementos HTML com os dados do contrato
+    function fillContractData(contractNumber) {
+      document.getElementById('contractDate').textContent = contractData[contractNumber].date;
+      document.getElementById('contractTime').textContent = contractData[contractNumber].time;
+      document.getElementById('contractTag').textContent = contractData[contractNumber].tag;
+      document.getElementById('contractNumLocomotives').textContent = contractData[contractNumber].numLocomotives;
+      document.getElementById('contractNumVagons').textContent = contractData[contractNumber].numVagons;
+      document.getElementById('contractWeight').textContent = contractData[contractNumber].weight;
+    }
+
+    // Verificar se o contrato existe e preencher as informações corretas
+    const contractNumber = getContractNumberFromURL();
+    if (contractData.hasOwnProperty(contractNumber)) {
+      fillContractData(contractNumber);
+    } else {
+      alert('Número de contrato inválido. Tente novamente.');
+      goBack();
+    }
+
+    // Função para retornar à página anterior
+    function goBack() {
+      window.history.back();
+    }
+
+    // Função para exibir a caixa de diálogo de confirmação
+    function showConfirmationDialog() {
+      const dialogOverlay = document.getElementById('dialogOverlay');
+      dialogOverlay.style.display = 'block';
+    }
+
+    // Função para transferir para o fornecedor
+    function transferToSupplier() {
+      const contractAddress = "0xC8e4098D19E0169CfEF9114017f73Ccb45ee2abe";
+      const contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "ajustarPesagem",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "deposit",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "isValid",
+				"type": "bool"
+			}
+		],
+		"name": "informarValidacao",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "date",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "time",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "tag",
+				"type": "string"
+			},
+			{
+				"internalType": "uint8",
+				"name": "numLocomotives",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint8",
+				"name": "numVagons",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint256",
+				"name": "weight",
+				"type": "uint256"
+			}
+		],
+		"name": "registrarPesagem",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "PesagemAjustada",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "PesagemRegistrada",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "PesagemValidada",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "recipient",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "SaldoTransferido",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "recipient",
+				"type": "string"
+			}
+		],
+		"name": "transferTo",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "balance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "contratosPesagem",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "date",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "time",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "tag",
+				"type": "string"
+			},
+			{
+				"internalType": "uint8",
+				"name": "numLocomotives",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint8",
+				"name": "numVagons",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint256",
+				"name": "weight",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "isValidated",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "fornecedor",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getContratoPesagem",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "date",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "time",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "tag",
+						"type": "string"
+					},
+					{
+						"internalType": "uint8",
+						"name": "numLocomotives",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint8",
+						"name": "numVagons",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint256",
+						"name": "weight",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "isValidated",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct PesagemContract.ContratoPesagem",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getNumContratosPesagem",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "usuario",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+      // Cria uma instância do contrato web3
+      const web3 = new Web3(window.ethereum);
+      const contractInstance = new web3.eth.Contract(contractABI, contractAddress);
+
+      // Chama a função 'deposit' do Smart Contract para transferir o saldo ao fornecedor
+  contractInstance.methods.deposit().send({ from: window.ethereum.selectedAddress })
+    .then(function(receipt) {
+      // A transação foi bem-sucedida
+      showValidationMessage('Saldo transferido ao fornecedor com sucesso!');
+    })
+    .catch(function(error) {
+      // A transação falhou
+      showValidationMessage('Falha ao transferir saldo ao fornecedor. Verifique se você é o usuário correto e se possui saldo suficiente em Ether para a transação.');
+    });
+
+    }
+
+    // Função para transferir para o usuário
+    function transferToUser() {
+      const contractAddress = "0xC8e4098D19E0169CfEF9114017f73Ccb45ee2abe";
+      const contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "ajustarPesagem",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "deposit",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "isValid",
+				"type": "bool"
+			}
+		],
+		"name": "informarValidacao",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "date",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "time",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "tag",
+				"type": "string"
+			},
+			{
+				"internalType": "uint8",
+				"name": "numLocomotives",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint8",
+				"name": "numVagons",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint256",
+				"name": "weight",
+				"type": "uint256"
+			}
+		],
+		"name": "registrarPesagem",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "PesagemAjustada",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "PesagemRegistrada",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "PesagemValidada",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "recipient",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "SaldoTransferido",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "recipient",
+				"type": "string"
+			}
+		],
+		"name": "transferTo",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "balance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "contratosPesagem",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "date",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "time",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "tag",
+				"type": "string"
+			},
+			{
+				"internalType": "uint8",
+				"name": "numLocomotives",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint8",
+				"name": "numVagons",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint256",
+				"name": "weight",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "isValidated",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "fornecedor",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getContratoPesagem",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "date",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "time",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "tag",
+						"type": "string"
+					},
+					{
+						"internalType": "uint8",
+						"name": "numLocomotives",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint8",
+						"name": "numVagons",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint256",
+						"name": "weight",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "isValidated",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct PesagemContract.ContratoPesagem",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getNumContratosPesagem",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "usuario",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+      // Cria uma instância do contrato web3
+  const web3 = new Web3(window.ethereum);
+  const contractInstance = new web3.eth.Contract(contractABI, contractAddress);
+
+  // Chama a função 'withdraw' do Smart Contract para transferir o saldo ao usuário
+  contractInstance.methods.withdraw().send({ from: window.ethereum.selectedAddress })
+    .then(function(receipt) {
+      // A transação foi bem-sucedida
+      showValidationMessage('Saldo transferido ao usuário com sucesso!');
+    })
+    .catch(function(error) {
+      // A transação falhou
+      showValidationMessage('Falha ao transferir saldo ao usuário. Verifique se você é o usuário correto e se possui saldo suficiente em Ether para a transação.');
+    });
+}
+
+function validatePesagem() {
+
+    // Função para fechar a caixa de diálogo
+    function closeDialog() {
+      const dialogOverlay = document.getElementById('dialogOverlay');
+      dialogOverlay.style.display = 'none';
+    }
+
+    // Função para exibir a situação do contrato
+    function showContractStatus(status) {
+      const contractStatusElement = document.getElementById('contractStatus');
+
+      if (status === 'validated') {
+        contractStatusElement.textContent = 'Contrato Validado';
+        contractStatusElement.classList.add('validated');
+        contractStatusElement.classList.remove('inAnalysis');
+      } else if (status === 'inAnalysis') {
+        contractStatusElement.textContent = 'O contrato está em análise';
+        contractStatusElement.classList.remove('validated');
+        contractStatusElement.classList.add('inAnalysis');
+      }
+    }
+
+    // Função para exibir a mensagem de validação
+    function showValidationMessage(message) {
+      const validationMessageElement = document.getElementById('validationMessage');
+      validationMessageElement.textContent = message;
+    }
+    contractInstance.methods.validarPesagem(contractIndex).send({ from: window.ethereum.selectedAddress })
+      .then(function(receipt) {
+        // A transação foi bem-sucedida
+        showContractStatus('validated');
+        showValidationMessage('Contrato validado com sucesso!');
+        closeDialog();
+      })
+      .catch(function(error) {
+        // A transação falhou
+        showValidationMessage('Falha ao validar pesagem. Verifique se você é o usuário correto e se possui saldo suficiente em Ether para a transação.');
+        closeDialog();
+      });
+
+  }
+
+  function adjustPesagem() {
+
+// Função para fechar a caixa de diálogo
+function closeDialog() {
+  const dialogOverlay = document.getElementById('dialogOverlay');
+  dialogOverlay.style.display = 'none';
+}
+
+// Função para exibir a situação do contrato
+function showContractStatus(status) {
+  const contractStatusElement = document.getElementById('contractStatus');
+
+  if (status === 'validated') {
+    contractStatusElement.textContent = 'Contrato Validado';
+    contractStatusElement.classList.add('validated');
+    contractStatusElement.classList.remove('inAnalysis');
+  } else if (status === 'inAnalysis') {
+    contractStatusElement.textContent = 'O contrato está em análise';
+    contractStatusElement.classList.remove('validated');
+    contractStatusElement.classList.add('inAnalysis');
+  }
+}
+contractInstance.methods.ajustarPesagem(contractIndex).send({ from: window.ethereum.selectedAddress })
+      .then(function(receipt) {
+        // A transação foi bem-sucedida
+        showContractStatus('inAnalysis');
+        showValidationMessage('Contrato ajustado com sucesso!');
+        closeDialog();
+      })
+      .catch(function(error) {
+        // A transação falhou
+        showValidationMessage('Falha ao ajustar pesagem. Verifique se você é o usuário correto e se possui saldo suficiente em Ether para a transação.');
+        closeDialog();
+      });
+}
+  </script>
+</body>
+</html>
